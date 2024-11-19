@@ -41,13 +41,24 @@ def _onehot_genome_fastx(gfname):
 def _onehot_genome(gfname):
     genome_dict = {}
     with open(gfname, "r") as fh:
+        seq = ""  
+        name = None  
         for line in fh:
             if line.startswith(">"):
-                name = line.split()[0].replace(">", '')
-            else:
-                seq = line.rstrip()
-                if name not in genome_dict:        
+                
+                if name is not None and seq:  
                     genome_dict[name] = [seq, _onehot_seq(seq)]
+                
+                
+                name = line.split()[0].replace(">", '')
+                seq = ""
+            else:
+                
+                seq += line.rstrip()
+        
+        
+        if name is not None and seq:
+            genome_dict[name] = [seq, _onehot_seq(seq)]
     
     return genome_dict
 
@@ -68,8 +79,9 @@ def _onehot_genome_motif(gfname, fimo_tsv, fill=999):
                 motif[start:end] = fill
     '''
     raise NotImplementedError
-
-
+#gfname = "D:/Nvwa/data/preparation/Test_Arabidopsis/Arabidopsis_updown10000bp.fa"
+#genome_dict = _onehot_genome(gfname)
+#out_fname = "D:/Nvwa/data/preparation/Test_Arabidopsis/Arabidopsis_updown10000bp.onehot.p"
 if __name__ == '__main__':
     from sys import argv
     assert len(argv) == 3

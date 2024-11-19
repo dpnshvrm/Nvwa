@@ -8,13 +8,13 @@ import pandas as pd
 
 from sklearn.model_selection import KFold, train_test_split
 
-mode, genome, label, annotation, output_dir = argv[1:6]
+mode, genome, label, annotation, output_dir, numberbp = argv[1:7]
 
 #mode = "train_test_split"
 #genome = "./Arabidopsis_updown500bp.onehot.p"
 #label = "./Arabidopsis_mincell20_t1e-3.p"
 #annotation = "./cell_metadata_with_Arabidopsis.txt"
-#output_dir = "test.h5"
+#output_dir = "test1.h5"
 
 #argv = [mode,genome,label,annotation,output_dir]
 logging.basicConfig(level=logging.INFO,
@@ -55,7 +55,7 @@ anno = anno.loc[select]
 # sort
 anno = anno.sort_values(["Cluster","Celltype","Cell"])
 celltypes = anno.Cell.values
-anno = anno.values
+anno = anno.fillna("").astype(str).values
 logging.info(anno.shape)
 
 cell_lineage = cell_lineage[celltypes]
@@ -91,9 +91,9 @@ for gene in cell_lineage.index.values:
         gene = gene.replace(".", "-", 1)
     if gene in data.keys():
         seq = data[gene][-1]
-        if seq.shape == (79, 4):
+        if seq.shape == (int(numberbp)*2-1, 4):
             seq = np.vstack((seq, np.zeros((1,4))))
-        if seq.shape == (80, 4):            
+        if seq.shape == (int(numberbp)*2, 4):            
             X.append(seq)
             y.append(label)
             geneName.append(gene)
@@ -109,8 +109,6 @@ logging.info(y.shape)
 
 del data, cell_lineage
 gc.collect()
-
-anno = [';'.join(map(str, item)) if isinstance(item, np.ndarray) else str(item) for item in anno]
 
 if mode == "train_test_split":
     # train and test split
