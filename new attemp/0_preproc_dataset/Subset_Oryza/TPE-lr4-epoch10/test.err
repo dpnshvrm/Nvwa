@@ -1,0 +1,3 @@
+/scratch2/tzhengz/anaconda3/envs/GPU/lib/python3.12/site-packages/torch/nn/init.py:511: UserWarning: Initializing zero-element tensors is a no-op
+  warnings.warn("Initializing zero-element tensors is a no-op")
+
